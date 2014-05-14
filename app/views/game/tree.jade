@@ -1,1 +1,5 @@
-.tree(data-id=tree._id.toString(), class=treeHelper.getClass(tree.height))
+.tree(data-id=tree._id.toString(), class=treeHelper.getClass(tree.height) class=tree.isHealthy ? 'alive' : 'dead' class=tree.isChopped ? 'chopped' : 'growing')
+  .height= tree.height
+  .health= tree.health
+  if(tree.isHealthy && tree.height > 48)
+    button#chop Chop!

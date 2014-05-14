@@ -9,10 +9,59 @@
     $('#login').click(login);
     $('#seed').click(seed);
     $('#getforest').click(getForest);
-    $('#forest').on('click', '.tree', grow);
+    $('#forest').on('click', '.tree.alive', grow);
+    $('#forest').on('click', '.tree.alive.adult #chop', chop);
+    $('#sell').click(sell);
+  }
+
+  function sell(event){
+    event.preventDefault();
+    var data = $(this).closest('form').serialize();
+    var userId = $('#username').data('id');
+    $.ajax({
+      url: '/sell/'+userId,
+      type: 'PUT',
+      data: data,
+      success: response=>{
+        $.ajax({
+          url: '/user/'+userId+'/stats',
+          type: 'GET',
+          dataType: 'html',
+          success: response=>{
+            $('#stats').empty().append(response);
+        }
+      });
+      }
+    });
+  }
+
+  function chop(event){
+    var tree = $(this).parent();
+    var treeId = $(tree).data('id');
+    var userId = $('#username').data('id');
+
+    $.ajax({
+      url: '/tree/'+treeId+'/chop',
+      type: 'PUT',
+      dataType: 'html',
+      success: response=>{
+        tree.replaceWith(response);
+
+        $.ajax({
+          url: '/user/'+userId+'/stats',
+          type: 'GET',
+          dataType: 'html',
+          success: response=>{
+            $('#stats').empty().append(response);
+        }
+      });
+    }
+  });
+    event.stopPropagation();
   }
 
   function grow(){
+    var tree = $(this);
     var treeId = $(this).data('id');
 
     $.ajax({
@@ -20,13 +69,13 @@
       type: 'PUT',
       dataType: 'html',
       success: response=>{
-        console.log(response);
+        tree.replaceWith(response);
       }
     });
   }
 
   function getForest(){
-    var userId = $('#username').data('id');
+    var userId = $('#username').attr('data-id');
 
     $.ajax({
       url: '/forest/' + userId,
